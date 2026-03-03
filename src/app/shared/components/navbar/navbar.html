@@ -1,0 +1,16 @@
+<nav class="navbar">
+  <a class="navbar__brand" routerLink="/">Voting App</a>
+
+  @if (auth.isLoggedIn()) {
+    <ul class="navbar__links">
+      @if (!auth.isAdmin()) {
+        <li><a routerLink="/vote" routerLinkActive="active">Vote</a></li>
+      }
+      @if (auth.isAdmin()) {
+        <li><a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a></li>
+        <li><a routerLink="/admin/users" routerLinkActive="active">Users</a></li>
+      }
+    </ul>
+    <button class="btn btn--outline btn--sm" (click)="logout()">Logout</button>
+  }
+</nav>

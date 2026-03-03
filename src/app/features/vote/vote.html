@@ -1,0 +1,57 @@
+<div class="vote-page">
+  <div class="vote-card">
+    <h1 class="vote-card__title">Cast Your Vote</h1>
+    <p class="vote-card__sub">Select a candidate below</p>
+
+    @if (loading()) {
+      <p class="loading-text">Loading candidates…</p>
+    } @else if (alreadyVoted()) {
+      <div class="voted-state">
+        @if (successMsg()) {
+          <div class="alert alert--success">{{ successMsg() }}</div>
+        }
+        @if (errorMsg()) {
+          <div class="alert alert--error">{{ errorMsg() }}</div>
+        }
+        <p class="voted-state__msg">Thank you for participating!</p>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="candidate-grid">
+          @for (c of candidates(); track c.name) {
+            <button
+              type="button"
+              class="candidate-btn"
+              [class.selected]="form.controls.candidate_name.value === c.name"
+              (click)="selectCandidate(c.name)"
+            >
+              {{ c.name }}
+            </button>
+          }
+        </div>
+
+        @if (form.controls.candidate_name.invalid && form.controls.candidate_name.touched) {
+          <span class="field-error">Please select a candidate.</span>
+        }
+
+        @if (errorMsg()) {
+          <div class="alert alert--error">{{ errorMsg() }}</div>
+        }
+
+        <div class="form-group">
+          <label for="custom-candidate">Or enter a name manually</label>
+          <input
+            id="custom-candidate"
+            type="text"
+            formControlName="candidate_name"
+            placeholder="Candidate name…"
+          />
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--full" [disabled]="submitting()">
+          {{ submitting() ? 'Submitting…' : 'Submit Vote' }}
+        </button>
+      </form>
+    }
+  </div>
+</div>

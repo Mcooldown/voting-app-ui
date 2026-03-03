@@ -1,0 +1,124 @@
+<div class="users-page">
+  <div class="page-header">
+    <h1>User Management</h1>
+    <button class="btn btn--primary" (click)="openCreate()">+ New User</button>
+  </div>
+
+  @if (successMsg()) {
+    <div class="alert alert--success">{{ successMsg() }}</div>
+  }
+  @if (errorMsg()) {
+    <div class="alert alert--error">{{ errorMsg() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading-text">Loading users…</p>
+  } @else if (users().length === 0) {
+    <p class="empty-text">No users found.</p>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of users(); track u._id) {
+            <tr>
+              <td class="username-cell">{{ u.name }}</td>
+              <td>
+                <span class="role-badge" [class.role-badge--admin]="u.role === 'admin'">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td class="actions-col">
+                <button class="btn btn--sm btn--outline" (click)="openEdit(u)">Edit</button>
+                <button class="btn btn--sm btn--danger" (click)="deleteUser(u._id)">Delete</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Dialog -->
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="closeDialog()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <div class="dialog__header">
+        <h2>{{ dialogMode() === 'create' ? 'Create User' : 'Edit User' }}</h2>
+        <button class="dialog__close" (click)="closeDialog()" aria-label="Close">&times;</button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="saveUser()" novalidate>
+        <div class="form-group">
+          <label for="d-name">Name</label>
+          <input
+            id="d-name"
+            type="text"
+            formControlName="name"
+            [class.is-invalid]="form.controls.name.invalid && form.controls.name.touched"
+          />
+          @if (form.controls.name.errors?.['required'] && form.controls.name.touched) {
+            <span class="field-error">Name is required.</span>
+          }
+          @if (form.controls.name.errors?.['minlength'] && form.controls.name.touched) {
+            <span class="field-error">Minimum 2 characters.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="d-email">Email</label>
+          <input
+            id="d-email"
+            type="email"
+            formControlName="email"
+            [class.is-invalid]="form.controls.email.invalid && form.controls.email.touched"
+          />
+          @if (form.controls.email.errors?.['required'] && form.controls.email.touched) {
+            <span class="field-error">Email is required.</span>
+          }
+          @if (form.controls.email.errors?.['email'] && form.controls.email.touched) {
+            <span class="field-error">Enter a valid email.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="d-password">
+            Password
+            @if (dialogMode() === 'edit') { <span class="optional">(leave blank to keep current)</span> }
+          </label>
+          <input
+            id="d-password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+          />
+          @if (form.controls.password.errors?.['required'] && form.controls.password.touched) {
+            <span class="field-error">Password is required.</span>
+          }
+          @if (form.controls.password.errors?.['minlength'] && form.controls.password.touched) {
+            <span class="field-error">Minimum 6 characters.</span>
+          }
+        </div>
+
+        @if (dialogError()) {
+          <div class="alert alert--error">{{ dialogError() }}</div>
+        }
+
+        <div class="dialog__footer">
+          <button type="button" class="btn btn--outline" (click)="closeDialog()">Cancel</button>
+          <button type="submit" class="btn btn--primary" [disabled]="dialogLoading()">
+            {{ dialogLoading() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

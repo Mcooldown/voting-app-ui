@@ -1,0 +1,35 @@
+<div class="dashboard-page">
+  <div class="page-header">
+    <h1>Vote Results</h1>
+    <span class="badge">Total votes: {{ totalVotes() }}</span>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-text">Loading results…</p>
+  } @else if (errorMsg()) {
+    <div class="alert alert--error">{{ errorMsg() }}</div>
+  } @else if (results().length === 0) {
+    <p class="empty-text">No votes have been cast yet.</p>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Candidate</th>
+            <th class="num-col">Votes</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of results(); track r.name; let i = $index) {
+            <tr [class.top-row]="i === 0">
+              <td class="rank">{{ i + 1 }}</td>
+              <td class="candidate-name">{{ r.name }}</td>
+              <td class="num-col">{{ r.voteCount | number }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
